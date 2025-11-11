@@ -1,0 +1,103 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2406                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      snappyHexMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#includeEtc "caseDicts/mesh/generation/snappyHexMeshDict.cfg"
+
+castellatedMesh on;
+snap            on;
+addLayers       on;
+
+geometry
+{
+    filterscreen
+    {
+        type triSurfaceMesh;
+        file "filterscreen.stl";
+    }
+
+    refinementBox
+    {
+        type box;
+        min  (-0.02245 0 -0.02245);
+        max  (0.02245 0.001 0.02245);
+    }
+}
+
+castellatedMeshControls
+{
+    features
+    (
+      { file  "filterscreen.eMesh"; level 1; }
+    );
+
+    refinementSurfaces
+    {
+        filterscreen
+        {
+            level (3 3);
+            patchInfo { type wall; }
+        }
+    }
+
+    refinementRegions
+    {
+        refinementBox
+        {
+            mode inside;
+            levels ((1 2));
+        }
+    }
+
+    locationInMesh (0 0 0);
+}
+
+snapControls
+{
+    explicitFeatureSnap    true;
+    implicitFeatureSnap    false;
+}
+
+addLayersControls
+{
+    layers
+    {
+        "filterscreen"
+        {
+            nSurfaceLayers 2;
+        }
+    }
+
+    relativeSizes       true;
+    expansionRatio      1.2;
+    finalLayerThickness 0.5;
+    minThickness        1e-3;
+}
+
+meshQualityControls
+{}
+
+writeFlags
+(
+    noRefinement
+    // scalarLevels
+    // layerSets
+    // layerFields
+);
+
+mergeTolerance 1e-5;
+
+
+// ************************************************************************* //
